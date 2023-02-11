@@ -11,8 +11,14 @@ class Globe {
   constructor(globeRef, frameTicker) {
     this.EARTH_RADIUS_KM = 6371; // km
     this.SAT_SIZE = 200; // km
-    this.TIME_STEP = 3 * 1000; // per frame
     this.FOCUS_COLOR = 'red';
+    this.TIME_STEP = {
+      x2: 2 * 1000,
+      x5: 5 * 1000,
+      x10: 10 * 1000
+    }; // per frame
+    this.TIME_SELECT = 'x2';
+    this.TIME_PAUSE = false;
 
     this.PATH_TIME_RANGE = 6000;
     this.PATH_TIME_STEP = 7;
@@ -109,21 +115,27 @@ class Globe {
   ticker() {
     requestAnimationFrame(this.ticker.bind(this));
 
-    this.time = new Date(+this.time + this.TIME_STEP);
-
-    const gmst = satellite.gstime(this.time);
-    this.satData.forEach((d, i) => {
-      const eci = satellite.propagate(d.satrec, this.time);
-      if (eci.position) {
-        const gdPos = satellite.eciToGeodetic(eci.position, gmst);
-        d.lat = satellite.radiansToDegrees(gdPos.latitude);
-        d.lng = satellite.radiansToDegrees(gdPos.longitude);
-        d.alt = gdPos.height / this.EARTH_RADIUS_KM
+    if (!this.TIME_PAUSE) {
+      if (this.TIME_SELECT == 'live') {
+        this.time = new Date();
+      } else {
+        this.time = new Date(+this.time + this.TIME_STEP[this.TIME_SELECT]);
       }
-    });
+
+      const gmst = satellite.gstime(this.time);
+      this.satData.forEach((d, i) => {
+        const eci = satellite.propagate(d.satrec, this.time);
+        if (eci.position) {
+          const gdPos = satellite.eciToGeodetic(eci.position, gmst);
+          d.lat = satellite.radiansToDegrees(gdPos.latitude);
+          d.lng = satellite.radiansToDegrees(gdPos.longitude);
+          d.alt = gdPos.height / this.EARTH_RADIUS_KM
+        }
+      });
+    }
 
     this.globe.objectsData(this.satData);
-    this.frameTicker(this.satData, this.time);
+    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT);
   }
 
   load(url) {
@@ -144,6 +156,10 @@ class Globe {
 
       this.updatePath();
     });
+  }
+
+  set pause(value) {
+    this.TIME_PAUSE = value;
   }
 
   setSatData(data) {
@@ -177,7 +193,7 @@ class Globe {
           const lat = satellite.radiansToDegrees(gdPos.latitude);
           const lng = satellite.radiansToDegrees(gdPos.longitude);
           const alt = gdPos.height / this.EARTH_RADIUS_KM
-          pathArr.push([lat, lng, alt]);
+          pathArr.push([lat, lng, alt, data.name]);
         }
       }
 
