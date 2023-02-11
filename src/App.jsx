@@ -1,19 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 
 import * as satellite from 'satellite.js';
 
 import Globe from './Globe.js';
 import tleUrl from './assets/tle.txt';
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-});
 
 function App() {
   const [globe, setGlobe] = useState(null);
@@ -32,18 +22,12 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <main>
-        <Button onClick={() => console.log(satData)} variant='contained'>Show</Button>
-        <div className="tr-container">
-          <Paper className="sat-list-paper" elevation={0}>
-            Hi
-          </Paper>
-        </div>
-        <Paper className="time-log" elevation={0}>{time.toString()}</Paper>
-        <div ref={globeRef} />
-      </main>
+    <main>
+      <div className="tr-container">
+        hi
+      </div>
+      <div className="time-log" elevation={0}>{time.toString()}</div>
+      <div ref={globeRef} />
       <style>{`
       .tr-container {
         position: absolute;
@@ -54,7 +38,7 @@ function App() {
         padding: 15px;
       }
       `}</style>
-    </ThemeProvider>
+    </main>
   )
 }
 
