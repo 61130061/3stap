@@ -37,10 +37,10 @@ function App() {
     <main>
       {globe &&
         <>
-          <div onClick={() => console.log(focus)} className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div>
+          <div onClick={() => console.log(focus)} className="z-20 text-5xl font-bold select-none absolute top-3 left-3">3STAP</div>
           <SatelliteList satData={satData} globe={globe} focus={focus} />
           <FocusInfo data={focus ? satData.filter(item => item.name == focus)[0] : null} earthRadius={globe.getEarthRadius()} />
-          <div className="absolute bottom-3 left-3 text-sm">
+          <div className="absolute bottom-3 z-20 left-3 text-sm">
             <div className="flex gap-2 mb-2">
               <button onClick={() => globe.pause = !pause} className="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded capitalize text-xs font-semibold">
                 {pause ?

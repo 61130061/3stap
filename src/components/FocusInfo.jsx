@@ -13,7 +13,7 @@ export default function FocusInfo ({ data, earthRadius }) {
   if (hide) {
     return (
       <button
-        className="absolute bottom-[10vh] right-3 font-bold w-12 h-12 bg-zinc-900 rounded"
+        className="absolute z-20 bottom-[10vh] right-3 font-bold w-12 h-12 bg-zinc-900 rounded"
         onClick={() => setHide(false)}
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 m-auto">
@@ -24,7 +24,7 @@ export default function FocusInfo ({ data, earthRadius }) {
   }
 
   return (
-    <div className="absolute max-w-[20vw] bottom-[10vh] right-3 bg-zinc-900 rounded-lg p-3 text-sm">
+    <div className="absolute z-20 max-w-[20vw] bottom-[10vh] right-3 bg-zinc-900 rounded-lg p-3 text-sm">
       <div className="flex justify-between items-center mb-2">
         <div className="uppercase font-semibold mr-10">Selected Satellite</div>
         <button className="w-5 h-5 rounded text-gray-400 hover:bg-zinc-800" onClick={() => setHide(true)}>

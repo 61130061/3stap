@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import * as satellite from 'satellite.js';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import countries from './assets/countries.json';
 import tleUrl from './assets/tle.txt';
 import globeTextureUrl from './assets/earth-water.png';
@@ -27,6 +28,7 @@ class Globe {
     this.frameTicker = frameTicker;
     this.time = new Date();
     this.satData = [];
+    this.labelObjs = [];
     this.focusSat = 'COSMOS 44';
 
     this.globe = new ThreeGlobe()
@@ -68,6 +70,16 @@ class Globe {
       globeMaterial.shininess = 0;
     });
 
+    // Label renderer
+    this.labelRenderer = new CSS2DRenderer();
+    this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    this.labelRenderer.domElement.style.position = 'absolute';
+    this.labelRenderer.domElement.style.top = '0px';
+    this.labelRenderer.domElement.style.left = '0px';
+    this.labelRenderer.domElement.id = 'label-renderer';
+    if (document.getElementById('label-renderer')) document.getElementById('label-renderer').outerHTML = '';
+    document.body.appendChild(this.labelRenderer.domElement);
+
     // Setup renderer
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -87,7 +99,7 @@ class Globe {
     this.camera.position.z = 400;
 
     // Add camera controls
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls = new OrbitControls(this.camera, this.labelRenderer.domElement);
     this.controls.enablePan = false;
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
@@ -104,12 +116,14 @@ class Globe {
       this.camera.updateProjectionMatrix();
 
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
     }, false);
   }
 
   animate() {
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
+    this.labelRenderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate.bind(this));
   }
 
@@ -136,6 +150,13 @@ class Globe {
     }
 
     this.globe.objectsData(this.satData);
+
+    // Update label position
+    this.labelObjs.map((d, i) => {
+      if (this.satData[i]) Object.assign(d.position, this.globe.getCoords(this.satData[i].lat, this.satData[i].lng, this.satData[i].alt));
+    });
+
+    // Send variable to react
     this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT, this.focusSat);
   }
 
@@ -146,16 +167,17 @@ class Globe {
         satrec: satellite.twoline2satrec(...tle),
         name: name.trim().replace(/^0 /, ''),
         path: null,
-        showLabel: true
+        showLabel: name.trim().replace(/^0 /, '') == 'COSMOS 44'
       }));
     }).then(() => {
       this.satData.map((d, i) => {
-        if (i) {
+        if (i) { // TODO: Fix this later
           this.genPath(d);
         }
       });
 
       this.updatePath();
+      this.updateLabel();
     });
   }
 
@@ -167,7 +189,7 @@ class Globe {
     this.TIME_SELECT = value;
   }
 
-  set focus(value) {
+  setFocus(value) {
     if (value == this.focusSat) {
       this.focusSat = null;
     } else {
@@ -180,6 +202,7 @@ class Globe {
     })
 
     this.globe.pathColor((d) => this.updatePathColor(d));
+    this.updateLabel();
   }
 
   getSatData() {
@@ -196,6 +219,58 @@ class Globe {
 
   getEarthRadius() {
     return this.EARTH_RADIUS_KM;
+  }
+
+  setLabel(name) {
+    this.satData.map((d, i) => {
+      if (d.name == name) d.showLabel = !d.showLabel;
+    });
+    this.updateLabel();
+  }
+
+  updateLabel() {
+    this.labelObjs.map((d, i) => {
+      if (document.getElementById(d.htmlId)) document.getElementById(d.htmlId).outerHTML = '';
+      this.scene.remove(d);
+    });
+    this.labelObjs = [];
+
+    this.satData.map((d, i) => {
+      const htmlId = `label-${d.name}`;
+
+      const labelDiv = document.createElement("div");
+      labelDiv.style.visibility = d.showLabel ? 'visible' : 'hidden';
+      labelDiv.style.zIndex = 10;
+      labelDiv.id = htmlId;
+      labelDiv.classList.add('label');
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('label-text');
+      textDiv.id = `satName-${d.name}`;
+      if (this.focusSat == d.name) labelDiv.classList.add('label-focus');
+      textDiv.innerText = d.name;
+      textDiv.onclick = () => {
+        this.setFocus(d.name);
+        location.href = '#sat-list-' + d.name;
+      }
+
+      const label = new CSS2DObject(labelDiv);
+      label.userData = {
+        htmlId,
+        cNormal: new THREE.Vector3(),
+        cPosition: new THREE.Vector3(),
+        mat4: new THREE.Matrix4(),
+        trackVisibility: () => { // the closer to the edge, the less opacity
+          // function hidden when satellite disappear
+          // https://codepen.io/prisoner849/pen/oNopjyb?editors=0010
+        }
+      }
+      Object.assign(label.position, this.globe.getCoords(this.satData[i].lat, this.satData[i].lng, this.satData[i].alt));
+      this.labelObjs.push(label);
+      this.scene.add(label);
+
+      labelDiv.appendChild(textDiv);
+      document.body.appendChild(labelDiv);
+    })
   }
 
   genPath(data) {
