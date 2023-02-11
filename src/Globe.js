@@ -132,12 +132,14 @@ class Globe {
       this.satData = tleData.map(([name, ...tle]) => ({
         satrec: satellite.twoline2satrec(...tle),
         name: name.trim().replace(/^0 /, ''),
-        path: name.trim().replace(/^0 /, '') == 'COSMOS 44' ? [] : null,
+        path: null,
         showLabel: true
       }));
     }).then(() => {
       this.satData.map((d, i) => {
-        this.genPath(d, this.time);
+        if (i) {
+          this.genPath(d);
+        }
       });
 
       this.updatePath();
@@ -160,14 +162,14 @@ class Globe {
     return this.time;
   }
 
-  genPath(data, t) {
+  genPath(data) {
     const index = this.satData.findIndex(item => item.name == data.name);
 
-    if (index > -1 && data.path) {
+    if (index > -1) {
       const pathArr = [];
 
       for (let i = 0; i < this.PATH_TIME_RANGE; i += this.PATH_TIME_STEP) {
-        const newt = new Date(+t + (i * 1000));
+        const newt = new Date(+this.time + (i * 1000));
         const gmst = satellite.gstime(newt);
         const eci = satellite.propagate(data.satrec, newt);
         if (eci.position) {
@@ -180,6 +182,15 @@ class Globe {
       }
 
       this.satData[index].path = pathArr;
+    }
+  }
+
+  delPath(data) {
+    const index = this.satData.findIndex(item => item.name == data.name);
+    if (index > -1) {
+      this.satData[index].path = null;
+
+      this.updatePath();
     }
   }
 
