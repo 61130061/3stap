@@ -163,6 +163,10 @@ class Globe {
     this.TIME_PAUSE = value;
   }
 
+  set timeSel(value) {
+    this.TIME_SELECT = value;
+  }
+
   setSatData(data) {
     this.satData = data;
   }

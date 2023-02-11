@@ -33,7 +33,7 @@ function App() {
 
   return (
     <main>
-      <div onClick={() => console.log(pause)} className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
+      <div onClick={() => console.log(timeSel)} className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
       <SatelliteList satData={satData} globe={globe} />
       <FocusInfo data={null} />
       <div className="absolute bottom-3 left-3 text-sm">
@@ -48,9 +48,14 @@ function App() {
               </svg>
             }
           </button>
-          <button className="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 rounded capitalize text-xs font-semibold">Live</button>
+          {timeSel == 'live' ?
+            <div className="px-3 py-2 bg-zinc-900 text-red-600 text-center hover:bg-zinc-800 rounded capitalize text-xs font-semibold">Live</div> :
+            <button onClick={() => globe.timeSel = 'live'} className="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 rounded capitalize text-xs font-semibold">Live</button>
+          }
           {['x2', 'x5', 'x10'].map((d, i) =>
-            <button className="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 rounded text-xs font-semibold" key={i}>{d}</button>
+            d == timeSel ?
+            <div className="px-3 py-2 select-none bg-zinc-900 border border-gray-400 rounded text-xs font-semibold" key={i}>{d}</div>:
+            <button onClick={() => globe.timeSel = d} className="px-3 py-2 bg-zinc-900 border border-transparent hover:bg-zinc-800 rounded text-xs font-semibold" key={i}>{d}</button>
           )}
         </div>
         <div className="p-1 bg-zinc-900 rounded">
