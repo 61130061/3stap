@@ -10,12 +10,12 @@ import globeTextureUrl from './assets/earth-water.png';
 class Globe {
   constructor(globeRef, frameTicker) {
     this.EARTH_RADIUS_KM = 6371; // km
-    this.SAT_SIZE = 200; // km
+    this.SAT_SIZE = 300; // km
     this.FOCUS_COLOR = 'red';
     this.TIME_STEP = {
-      x2: 2 * 1000,
-      x5: 5 * 1000,
-      x10: 10 * 1000
+      x2: 3 * 1000,
+      x5: 10 * 1000,
+      x10: 20 * 1000
     }; // per frame
     this.TIME_SELECT = 'x2';
     this.TIME_PAUSE = false;
@@ -27,7 +27,7 @@ class Globe {
     this.frameTicker = frameTicker;
     this.time = new Date();
     this.satData = [];
-    this.focusSat = null;
+    this.focusSat = 'COSMOS 44';
 
     this.globe = new ThreeGlobe()
       .polygonsData(
@@ -54,7 +54,7 @@ class Globe {
         return satMesh;
       })
       .pathsData([])
-      .pathColor(() => 'rgba(200,200,200,0.8)')
+      .pathColor((d) => this.updatePathColor(d))
       .pathPointAlt(pnt => pnt[2]) // set altitude accessor
       .pathTransitionDuration(0)
 
@@ -136,7 +136,7 @@ class Globe {
     }
 
     this.globe.objectsData(this.satData);
-    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT);
+    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT, this.focusSat);
   }
 
   load(url) {
@@ -165,6 +165,21 @@ class Globe {
 
   set timeSel(value) {
     this.TIME_SELECT = value;
+  }
+
+  set focus(value) {
+    if (value == this.focusSat) {
+      this.focusSat = null;
+    } else {
+      this.focusSat = value;
+    }
+
+    this.satData.map((d, i) => {
+      if (d.name == this.focusSat) d.obj.material.color.set(this.FOCUS_COLOR);
+      else d.obj.material.color.set('palegreen');
+    })
+
+    this.globe.pathColor((d) => this.updatePathColor(d));
   }
 
   setSatData(data) {
@@ -229,6 +244,13 @@ class Globe {
     })
 
     this.globe.pathsData(setArr);
+  }
+
+  updatePathColor(d) {
+    if (d[0][3] == this.focusSat) {
+      return 'yellow';
+    }
+    return 'rgba(200, 200, 200, 0.8)';
   }
 }
 

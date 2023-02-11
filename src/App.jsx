@@ -13,6 +13,7 @@ function App() {
   const [satData, setSatData] = useState([]);
   const [pause, setPause] = useState(false);
   const [timeSel, setTimeSel] = useState('x2');
+  const [focus, setFocus] = useState(null);
 
   const globeRef = useRef(null);
 
@@ -24,17 +25,18 @@ function App() {
     }
   }, [])
 
-  function frameTicker(sd, t, p, ts) {
+  function frameTicker(sd, t, p, ts, fs) {
     setSatData(sd);
     setTime(t);
     setPause(p);
     setTimeSel(ts);
+    setFocus(fs);
   }
 
   return (
     <main>
       <div onClick={() => console.log(timeSel)} className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
-      <SatelliteList satData={satData} globe={globe} />
+      <SatelliteList satData={satData} globe={globe} focus={focus} />
       <FocusInfo data={null} />
       <div className="absolute bottom-3 left-3 text-sm">
         <div className="flex gap-2 mb-2">
@@ -58,7 +60,7 @@ function App() {
             <button onClick={() => globe.timeSel = d} className="px-3 py-2 bg-zinc-900 border border-transparent hover:bg-zinc-800 rounded text-xs font-semibold" key={i}>{d}</button>
           )}
         </div>
-        <div className="p-1 bg-zinc-900 rounded">
+        <div className="px-2 py-1 bg-zinc-900 rounded">
           {time.toString()}
         </div>
       </div>
