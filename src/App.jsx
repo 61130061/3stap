@@ -23,21 +23,14 @@ function App() {
 
   return (
     <main>
-      <div className="tr-container">
-        hi
+      <div className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
+      <div className="absolute top-3 right-3 bg-zinc-900 rounded">
+        <div>List</div>
       </div>
-      <div className="time-log" elevation={0}>{time.toString()}</div>
+      <div className="absolute bottom-3 left-3 text-sm p-1 bg-zinc-900 rounded">
+        {time.toString()}
+      </div>
       <div ref={globeRef} />
-      <style>{`
-      .tr-container {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-      }
-      .sat-list-paper {
-        padding: 15px;
-      }
-      `}</style>
     </main>
   )
 }
