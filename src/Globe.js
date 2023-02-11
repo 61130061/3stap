@@ -14,6 +14,9 @@ class Globe {
     this.TIME_STEP = 3 * 1000; // per frame
     this.FOCUS_COLOR = 'red';
 
+    this.PATH_TIME_RANGE = 6000;
+    this.PATH_TIME_STEP = 7;
+
     this.globeRef = globeRef;
     this.frameTicker = frameTicker;
     this.time = new Date();
@@ -43,7 +46,11 @@ class Globe {
         d.obj = satMesh;
     
         return satMesh;
-      });
+      })
+      .pathsData([])
+      .pathColor(() => 'rgba(200,200,200,0.8)')
+      .pathPointAlt(pnt => pnt[2]) // set altitude accessor
+      .pathTransitionDuration(0)
 
     const globeMaterial = this.globe.globeMaterial();
     globeMaterial.bumpScale = 10;
@@ -125,10 +132,15 @@ class Globe {
       this.satData = tleData.map(([name, ...tle]) => ({
         satrec: satellite.twoline2satrec(...tle),
         name: name.trim().replace(/^0 /, ''),
-        showPath: false, // fix this laeer
+        path: name.trim().replace(/^0 /, '') == 'COSMOS 44' ? [] : null,
         showLabel: true
       }));
+    }).then(() => {
+      this.satData.map((d, i) => {
+        this.genPath(d, this.time);
+      });
 
+      this.updatePath();
     });
   }
 
@@ -146,6 +158,41 @@ class Globe {
 
   getTime() {
     return this.time;
+  }
+
+  genPath(data, t) {
+    const index = this.satData.findIndex(item => item.name == data.name);
+
+    if (index > -1 && data.path) {
+      const pathArr = [];
+
+      for (let i = 0; i < this.PATH_TIME_RANGE; i += this.PATH_TIME_STEP) {
+        const newt = new Date(+t + (i * 1000));
+        const gmst = satellite.gstime(newt);
+        const eci = satellite.propagate(data.satrec, newt);
+        if (eci.position) {
+          const gdPos = satellite.eciToGeodetic(eci.position, gmst);
+          const lat = satellite.radiansToDegrees(gdPos.latitude);
+          const lng = satellite.radiansToDegrees(gdPos.longitude);
+          const alt = gdPos.height / this.EARTH_RADIUS_KM
+          pathArr.push([lat, lng, alt]);
+        }
+      }
+
+      this.satData[index].path = pathArr;
+    }
+  }
+
+  updatePath() {
+    const setArr = [];
+
+    this.satData.map((d, i) => {
+      if (d.path && d.path.length > 0) {
+        setArr.push(d.path);
+      }
+    })
+
+    this.globe.pathsData(setArr);
   }
 }
 

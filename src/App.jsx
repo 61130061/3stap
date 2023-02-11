@@ -25,7 +25,7 @@ function App() {
 
   return (
     <main>
-      <div className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
+      <div onClick={() => globe.test()} className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
       <SatelliteList satData={satData} />
       <FocusInfo data={null} />
       <div className="absolute bottom-3 left-3 text-sm p-1 bg-zinc-900 rounded">
