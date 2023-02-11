@@ -182,16 +182,8 @@ class Globe {
     this.globe.pathColor((d) => this.updatePathColor(d));
   }
 
-  setSatData(data) {
-    this.satData = data;
-  }
-
   getSatData() {
     return this.satData;
-  }
-
-  setTime(t) {
-    this.time = new Date(t);
   }
 
   getTime() {
@@ -200,6 +192,10 @@ class Globe {
 
   getCamera() {
     return this.camera;
+  }
+
+  getEarthRadius() {
+    return this.EARTH_RADIUS_KM;
   }
 
   genPath(data) {
