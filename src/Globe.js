@@ -88,6 +88,7 @@ class Globe {
 
     // Add camera controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enablePan = false;
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
 
@@ -176,6 +177,10 @@ class Globe {
 
   getTime() {
     return this.time;
+  }
+
+  getCamera() {
+    return this.camera;
   }
 
   genPath(data) {
