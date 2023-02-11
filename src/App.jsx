@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as satellite from 'satellite.js';
 
 import SatelliteList from './components/SatelliteList';
+import FocusInfo from './components/FocusInfo';
 
 import Globe from './Globe.js';
 import tleUrl from './assets/tle.txt';
@@ -26,6 +27,7 @@ function App() {
     <main>
       <div className="text-5xl font-bold select-none absolute top-3 left-3">3STAP</div> 
       <SatelliteList satData={satData} />
+      <FocusInfo data={null} />
       <div className="absolute bottom-3 left-3 text-sm p-1 bg-zinc-900 rounded">
         {time.toString()}
       </div>
