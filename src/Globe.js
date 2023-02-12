@@ -22,14 +22,14 @@ class Globe {
     this.TIME_PAUSE = false;
 
     this.PATH_TIME_RANGE = 6000;
-    this.PATH_TIME_STEP = 7;
+    this.PATH_TIME_STEP = 10;
 
     this.globeRef = globeRef;
     this.frameTicker = frameTicker;
     this.time = new Date();
     this.satData = [];
     this.labelObjs = [];
-    this.focusSat = 'COSMOS 44';
+    this.focusSat = 'CALSPHERE 1';
 
     this.globe = new ThreeGlobe()
       .polygonsData(
@@ -104,7 +104,7 @@ class Globe {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
     this.controls.minDistance = 200;
-    this.controls.maxDistance = 500;
+    this.controls.maxDistance = 1000;
 
     this.animate();
 
@@ -126,6 +126,8 @@ class Globe {
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
     this.labelRenderer.render(this.scene, this.camera);
+    // Send variable to react
+    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT, this.focusSat);
     requestAnimationFrame(this.animate.bind(this));
   }
 
@@ -158,9 +160,6 @@ class Globe {
     this.labelObjs.map((d, i) => {
       if (this.satData[i]) Object.assign(d.position, this.globe.getCoords(this.satData[i].lat, this.satData[i].lng, this.satData[i].alt));
     });
-
-    // Send variable to react
-    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT, this.focusSat);
   }
 
   load(url) {
@@ -170,11 +169,11 @@ class Globe {
         satrec: satellite.twoline2satrec(...tle),
         name: name.trim().replace(/^0 /, ''),
         path: null,
-        showLabel: name.trim().replace(/^0 /, '') == 'COSMOS 44'
+        showLabel: name.trim().replace(/^0 /, '') == 'CALSPHERE 1' | name.trim().replace(/^0 /, '') == 'CALSPHERE 2'
       }));
     }).then(() => {
       this.satData.map((d, i) => {
-        if (i) { // TODO: Fix this later
+        if (i < 2) { // TODO: Fix this later
           this.genPath(d);
         }
       });
@@ -329,6 +328,14 @@ class Globe {
       return 'yellow';
     }
     return 'rgba(200, 200, 200, 0.8)';
+  }
+
+  checkSatAdd(name) {
+    for(let i=0; i<this.satData.length; i++) {
+      if (name == this.satData[i].name) return true
+    }
+
+    return false;
   }
 }
 

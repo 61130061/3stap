@@ -13,7 +13,7 @@ export default function FocusInfo ({ data, earthRadius }) {
   if (hide) {
     return (
       <button
-        className="absolute z-20 bottom-[10vh] right-3 font-bold w-12 h-12 bg-zinc-900 rounded-lg text-gray-400"
+        className="absolute z-[90] bottom-[10vh] right-3 font-bold w-12 h-12 bg-zinc-900 rounded-lg text-gray-400"
         onClick={() => setHide(false)}
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 m-auto">

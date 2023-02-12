@@ -8,9 +8,9 @@ export default function SatelliteList({ satData, globe, focus, norad }) {
   return (
     <>
       {modal &&
-        <AddSatelliteModal norad={norad} onClose={() => setModal(false)} />
+        <AddSatelliteModal globe={globe} norad={norad} onClose={() => setModal(false)} />
       }
-      <div className="absolute top-3 right-3 bg-zinc-900 z-20 rounded-lg py-3 text-sm flex flex-col gap-2">
+      <div className="absolute top-3 right-3 bg-zinc-900 z-[90] rounded-lg py-3 text-sm flex flex-col gap-2">
         {satData.length > 0 &&
           <div className="grid grid-cols-6 gap-2 px-4 py-1 items-center uppercase text-xs font-semibold">
             <div className="col-span-3">Satellite</div>
@@ -20,9 +20,9 @@ export default function SatelliteList({ satData, globe, focus, norad }) {
           </div>
         }
         {satData.length > 0 &&
-          <div className="max-h-[30vh] overflow-y-auto">
+          <div className="max-h-[30vh] overflow-y-auto scroll-smooth">
             {satData.map((d, i) =>
-              <div key={i} id={'#sat-list-' + d.name} className="grid grid-cols-6 gap-2 hover:bg-zinc-800 px-4 py-1 items-center">
+              <div key={i} id={'sat-list-' + d.name} className="grid grid-cols-6 gap-2 hover:bg-zinc-800 px-4 py-1 items-center">
                 <div onClick={() => globe.setFocus(d.name)} className={`hover:cursor-pointer col-span-3${d.name == focus ? ' text-yellow-300' : ''}`}>{d.name}</div>
                 <div className="flex justify-center">
                   {d.showLabel ?
