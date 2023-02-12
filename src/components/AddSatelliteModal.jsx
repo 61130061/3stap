@@ -1,4 +1,20 @@
-export default function AddSatelliteModal({ onClose }) {
+import React, { useState } from 'react';
+
+export default function AddSatelliteModal({ onClose, norad }) {
+  const [search, setSearch] = useState('');
+  const [range, setRange] = useState([0, 30])
+  const [data, setData] = useState(norad.slice(range[0], range[1]));
+
+  const handleScroll = e => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 100;
+
+    if (bottom) {
+      console.log('Bottom now!');
+      const newRange = [range[0]+20, range[1]+20]
+      setData([...data, ...norad.slice(newRange[0], newRange[1])])
+      setRange(newRange);
+    }
+  };
 
   return (
     <div className="relative z-30" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -20,19 +36,22 @@ export default function AddSatelliteModal({ onClose }) {
                 <div>Name</div>
                 <div className="text-center">Norad CAT ID</div>
               </div>
-              <div className="relative bg-zinc-900 overflow-y-auto max-h-[50vh]">
-                {[...Array(30)].map((d, i) => 
-                  <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
-                    <div className="">CALSPHERE 1</div>
-                    <div className="text-center">900</div>
-                    <div className="flex justify-end">
-                      <button className="px-3 py-1 text-xs bg-zinc-800 rounded border border-zinc-900">
-                        +
-                      </button>
+              {data ? 
+                <div onScroll={e => handleScroll(e)} className="relative bg-zinc-900 overflow-y-auto max-h-[50vh]">
+                  {data.map((d, i) =>
+                    <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
+                      <div className="">{d.OBJECT_NAME}</div>
+                      <div className="text-center">{d.NORAD_CAT_ID}</div>
+                      <div className="flex justify-end">
+                        <button className="px-3 py-1 text-xs bg-zinc-800 rounded border border-zinc-900">
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>:
+                <div className="px-5 text-xs text-center">Loading...</div>
+              }
             </div>
           </div>
         </div>

@@ -5,10 +5,13 @@ import SatelliteList from './components/SatelliteList';
 import FocusInfo from './components/FocusInfo';
 
 import Globe from './Globe.js';
-
-// Satellite Data Source - https://celestrak.org/NORAD/elements/index.php?FORMAT=tle
+import noradJson from './assets/norad_active.json';
+import tleActive from './assets/tle_active.txt';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+  const [norad, setNorad] = useState(null);
+
   const [globe, setGlobe] = useState(null);
   const [time, setTime] = useState(new Date());
   const [satData, setSatData] = useState([]);
@@ -19,12 +22,22 @@ function App() {
   const globeRef = useRef(null);
 
   useEffect(() => {
-    setGlobe(new Globe(globeRef, frameTicker));
+    //setGlobe(new Globe(globeRef, frameTicker));
+
+    if (!norad) fetchNoradData(setNorad);
 
     return () => {
       setGlobe(null);
     }
   }, [])
+
+  useEffect(() => {
+    if (norad) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, [norad])
 
   function frameTicker(sd, t, p, ts, fs) {
     setSatData([...sd]);
@@ -34,10 +47,47 @@ function App() {
     setFocus(fs);
   }
 
+  function fetchNoradData(set) {
+    // Currently fetch only active satellite data (static file)
+    // Satellite Data Source - https://celestrak.org/NORAD/elements/index.php?FORMAT=tle
+    /*
+     TODO: 
+     - [ ] fetch directly from source (problem: too slow)
+     - [ ] fetch more other categories data
+    */
+
+    let arr = [];
+
+    fetch(tleActive).then(res => res.text()).then(rawData => {
+      const tleData = rawData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'));
+      tleData.forEach((d) => {
+        d[0] = d[0].trim().replace(/^0 /, ''); // trim name
+
+        const nd = noradJson.filter(item => item.OBJECT_NAME == d[0]);
+
+        if (nd[0]) {
+          arr.push({ ...nd[0],
+            tle: d
+          })
+        }
+      });
+    })
+
+    set(arr);
+  }
+
+  if (loading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
   return (
     <main>
-      <div onClick={() => console.log(pause)} className="z-20 text-5xl font-bold select-none absolute top-3 left-3">3STAP</div>
-      <SatelliteList satData={satData} globe={globe} focus={focus} />
+      <div className="z-20 text-5xl font-bold select-none absolute top-3 left-3">3STAP</div>
+      <SatelliteList norad={norad} satData={satData} globe={globe} focus={focus} />
       <FocusInfo data={focus ? satData.filter(item => item.name == focus)[0] : null} earthRadius={globe?.getEarthRadius()} />
       <div className="absolute bottom-3 z-20 left-3 text-sm">
         <div className="flex gap-2 mb-2">

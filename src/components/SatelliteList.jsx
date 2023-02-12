@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 
 import AddSatelliteModal from './AddSatelliteModal';
 
-export default function SatelliteList({ satData, globe, focus }) {
+export default function SatelliteList({ satData, globe, focus, norad }) {
   const [modal, setModal] = useState(false);
 
   return (
     <>
       {modal &&
-        <AddSatelliteModal onClose={() => setModal(false)} />
+        <AddSatelliteModal norad={norad} onClose={() => setModal(false)} />
       }
       <div className="absolute top-3 right-3 bg-zinc-900 z-20 rounded-lg py-3 text-sm flex flex-col gap-2">
         {satData.length > 0 &&
