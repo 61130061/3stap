@@ -103,6 +103,8 @@ class Globe {
     this.controls.enablePan = false;
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
+    this.controls.minDistance = 200;
+    this.controls.maxDistance = 500;
 
     this.animate();
 
@@ -147,9 +149,10 @@ class Globe {
           d.alt = gdPos.height / this.EARTH_RADIUS_KM
         }
       });
+
+      this.globe.objectsData(this.satData);
     }
 
-    this.globe.objectsData(this.satData);
 
     // Update label position
     this.labelObjs.map((d, i) => {
@@ -245,6 +248,7 @@ class Globe {
       labelDiv.classList.add('label');
       const textDiv = document.createElement('div');
       textDiv.classList.add('label-text');
+      textDiv.classList.add('select-none');
       textDiv.id = `satName-${d.name}`;
       if (this.focusSat == d.name) labelDiv.classList.add('label-focus');
       textDiv.innerText = d.name;
