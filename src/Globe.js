@@ -283,8 +283,10 @@ class Globe {
     if (index > -1) {
       const pathArr = [];
 
+      const t = new Date(+this.time);
+
       for (let i = 0; i < this.PATH_TIME_RANGE; i += this.PATH_TIME_STEP) {
-        const newt = new Date(+this.time + (i * 1000));
+        const newt = new Date(+t + (i * 1000));
         const gmst = satellite.gstime(newt);
         const eci = satellite.propagate(data.satrec, newt);
         if (eci.position) {
@@ -297,6 +299,7 @@ class Globe {
       }
 
       this.satData[index].path = pathArr;
+      this.satData[index].pathUpdate = new Date(+t + (this.PATH_TIME_RANGE * 1000))
     }
   }
 
