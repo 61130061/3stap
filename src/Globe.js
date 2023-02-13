@@ -141,6 +141,7 @@ class Globe {
         this.time = new Date(+this.time + this.TIME_STEP[this.TIME_SELECT]);
       }
 
+      let isUpdatePath = false;
       const gmst = satellite.gstime(this.time);
       this.satData.forEach((d, i) => {
         const eci = satellite.propagate(d.satrec, this.time);
@@ -150,16 +151,25 @@ class Globe {
           d.lng = satellite.radiansToDegrees(gdPos.longitude);
           d.alt = gdPos.height / this.EARTH_RADIUS_KM
         }
+
+        // Auto update path when orbit completed
+        if (d.pathUpdate) {
+          if (this.time.getTime() > d.pathUpdate.getTime()) {
+            this.genPath(d);
+            isUpdatePath = true
+          }
+        }
       });
 
       this.globe.objectsData(this.satData);
+
+      if (isUpdatePath) this.updatePath();
+
+      // Update label position
+      this.labelObjs.map((d, i) => {
+        if (this.satData[i]) Object.assign(d.position, this.globe.getCoords(this.satData[i].lat, this.satData[i].lng, this.satData[i].alt));
+      });
     }
-
-
-    // Update label position
-    this.labelObjs.map((d, i) => {
-      if (this.satData[i]) Object.assign(d.position, this.globe.getCoords(this.satData[i].lat, this.satData[i].lng, this.satData[i].alt));
-    });
   }
 
   load(url) {

@@ -10,7 +10,7 @@ export default function SatelliteList({ satData, globe, focus, norad }) {
       {modal &&
         <AddSatelliteModal globe={globe} norad={norad} onClose={() => setModal(false)} />
       }
-      <div className="absolute top-3 right-3 bg-zinc-900 z-[90] rounded-lg py-3 text-sm flex flex-col gap-2">
+      <div className="absolute max-w-[360px] top-3 right-3 bg-zinc-900 z-[90] rounded-lg py-3 text-sm flex flex-col gap-2">
         {satData.length > 0 &&
           <div className="grid grid-cols-6 gap-2 px-4 py-1 items-center uppercase text-xs font-semibold">
             <div className="col-span-3">Satellite</div>
