@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function AddSatelliteModal({ onClose, norad, globe }) {
+export default function AddSatelliteModal({ onClose, norad, globe, onPushSats }) {
   const [search, setSearch] = useState('');
   const [range, setRange] = useState([0, 30])
   const [data, setData] = useState(norad.filter(item => !globe.checkSatAdd(item.OBJECT_NAME)).slice(range[0], range[1]));
@@ -43,7 +43,7 @@ export default function AddSatelliteModal({ onClose, norad, globe }) {
                       <div className="">{d.OBJECT_NAME}</div>
                       <div className="text-center">{d.NORAD_CAT_ID}</div>
                       <div className="flex justify-end">
-                        <button className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
+                        <button onClick={() => onPushSats(d.tle)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                           </svg>

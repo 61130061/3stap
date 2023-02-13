@@ -29,7 +29,7 @@ class Globe {
     this.time = new Date();
     this.satData = [];
     this.labelObjs = [];
-    this.focusSat = 'CALSPHERE 1';
+    this.focusSat = 'STARLETTE';
 
     this.globe = new ThreeGlobe()
       .polygonsData(
@@ -179,7 +179,7 @@ class Globe {
         satrec: satellite.twoline2satrec(...tle),
         name: name.trim().replace(/^0 /, ''),
         path: null,
-        showLabel: name.trim().replace(/^0 /, '') == 'CALSPHERE 1' | name.trim().replace(/^0 /, '') == 'CALSPHERE 2'
+        showLabel: name.trim().replace(/^0 /, '') == 'STARLETTE' | name.trim().replace(/^0 /, '') == 'UOSAT 2 (UO-11)'
       }));
     }).then(() => {
       this.satData.map((d, i) => {
@@ -346,6 +346,25 @@ class Globe {
     }
 
     return false;
+  }
+
+  delSat(name) {
+    this.satData = this.satData.filter(item => item.name != name);
+    if (this.focusSat == name) this.setFocus(null); 
+    this.updateLabel();
+  }
+
+  pushSats(arr) {
+    arr.map(([name, ...tle]) => {
+      this.satData.unshift({
+        satrec: satellite.twoline2satrec(...tle),
+        name: name.trim().replace(/^0 /, ''),
+        path: null,
+        showLabel: true 
+      });
+    });
+
+    this.updateLabel();
   }
 }
 

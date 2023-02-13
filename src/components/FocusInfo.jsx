@@ -33,19 +33,19 @@ export default function FocusInfo ({ data, earthRadius }) {
           </svg>
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-center">
+      <div className="grid grid-cols-2 gap-1 py-1 items-start">
         <div className="uppercase">Name</div>
         <div>{data.name}</div>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-center">
+      <div className="grid grid-cols-2 gap-1 py-1 items-start">
         <div>lat</div>
         <div>{data.lat.toFixed(3)}</div>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-center">
+      <div className="grid grid-cols-2 gap-1 py-1 items-start">
         <div>lng</div>
         <div>{data.lng.toFixed(3)}</div>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-center">
+      <div className="grid grid-cols-2 gap-1 py-1 items-start">
         <div>alt</div>
         <div>{(data.alt * earthRadius).toFixed(3)}</div>
       </div>
