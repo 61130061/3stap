@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 /* 
 TODO:
 - [ ] Unit
-- [ ] Fix alt value by multiply by EARTH_RADIUS
+- [x] Fix alt value by multiply by EARTH_RADIUS
 */
 export default function FocusInfo ({ data, earthRadius }) {
   const [hide, setHide] = useState(false);

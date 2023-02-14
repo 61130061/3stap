@@ -8,8 +8,11 @@ import countries from './assets/countries.json';
 import tleUrl from './assets/tle.txt';
 import globeTextureUrl from './assets/earth-water.png';
 
+
 class Globe {
   constructor(globeRef, frameTicker) {
+    const scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'start' };
+
     this.EARTH_RADIUS_KM = 6371; // km
     this.SAT_SIZE = 300; // km
     this.FOCUS_COLOR = 'red';
@@ -30,10 +33,6 @@ class Globe {
     this.satData = [];
     this.labelObjs = [];
     this.focusSat = 'STARLETTE';
-
-    // mouse intersections
-    this.raycaster = new THREE.Raycaster();
-    this.mouse = new THREE.Vector2();
 
     this.globe = new ThreeGlobe()
       .polygonsData(
@@ -110,6 +109,10 @@ class Globe {
     this.controls.minDistance = 200;
     this.controls.maxDistance = 1000;
 
+    // Setup mouse intersections
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
     this.animate();
 
     this.load(tleUrl);
@@ -126,12 +129,13 @@ class Globe {
     }, false);
 
     // Detect Click on Satellite
-    document.addEventListener('mousedown', (event) => {
+    document.addEventListener('mousedown', (e) => {
       // For the following method to work correctly, set the canvas position *static*; margin > 0 and padding > 0 are OK
-      this.mouse.x = ((event.clientX - this.renderer.domElement.offsetLeft) / this.renderer.domElement.clientWidth) * 2 - 1;
-      this.mouse.y = - ((event.clientY - this.renderer.domElement.offsetTop) / this.renderer.domElement.clientHeight) * 2 + 1;
+      this.mouse.x = ((e.clientX - this.renderer.domElement.offsetLeft) / this.renderer.domElement.clientWidth) * 2 - 1;
+      this.mouse.y = - ((e.clientY - this.renderer.domElement.offsetTop) / this.renderer.domElement.clientHeight) * 2 + 1;
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
+
       const meshArr = [];
       this.satData.map((d) => {
         meshArr.push(d.obj);
@@ -141,7 +145,7 @@ class Globe {
 
       if (intersects.length > 0) {
         this.setFocus(intersects[0].object.name);
-        location.href = '#sat-list-' + intersects[0].object.name;
+        document.getElementById('sat-list-' + d.name).scrollIntoView(scrollOption);
       }
 
     }, false);
@@ -281,16 +285,6 @@ class Globe {
       labelDiv.style.zIndex = 10;
       labelDiv.id = htmlId;
       labelDiv.classList.add('label');
-      const textDiv = document.createElement('div');
-      textDiv.classList.add('label-text');
-      textDiv.classList.add('select-none');
-      textDiv.id = `satName-${d.name}`;
-      if (this.focusSat == d.name) labelDiv.classList.add('label-focus');
-      textDiv.innerText = d.name;
-      textDiv.onclick = () => {
-        this.setFocus(d.name);
-        location.href = '#sat-list-' + d.name;
-      }
 
       const label = new CSS2DObject(labelDiv);
       label.userData = {
@@ -307,7 +301,24 @@ class Globe {
       this.labelObjs.push(label);
       this.scene.add(label);
 
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('label-text');
+      textDiv.classList.add('select-none');
+      textDiv.id = `satName-${d.name}`;
+      if (this.focusSat == d.name) labelDiv.classList.add('label-focus');
+      textDiv.innerText = d.name;
+      labelDiv.onclick = () => {
+        this.setFocus(d.name);
+        document.getElementById('sat-list-' + d.name).scrollIntoView(scrollOption);
+      }
       labelDiv.appendChild(textDiv);
+
+      /*
+      const hoverDiv = document.createElement('div');
+      hoverDiv.classList.add('hover-area');
+      labelDiv.appendChild(hoverDiv);
+      */
+
       document.body.appendChild(labelDiv);
     })
   }

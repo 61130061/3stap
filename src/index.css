@@ -72,6 +72,17 @@ body {
   /*margin-left: 0px;*/
   overflow: hidden;
   padding: 0px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.label .hover-area {
+  width: 2vw;
+  height: 2vh;
+  background-color: red;
+  opacity: 70;
 }
 
 .label.label-focus {
