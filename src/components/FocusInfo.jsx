@@ -24,7 +24,7 @@ export default function FocusInfo ({ data, earthRadius }) {
   }
 
   return (
-    <div className="absolute z-20 max-w-[480px] bottom-[10vh] right-3 bg-zinc-900 rounded-lg p-3 text-sm">
+    <div className="absolute z-20 max-w-[240px] bottom-[10vh] right-3 bg-zinc-900 rounded-lg p-3 text-sm">
       <div className="flex justify-between items-center mb-2">
         <div className="uppercase font-semibold mr-10">Selected Satellite</div>
         <button className="w-5 h-5 rounded text-gray-400 hover:bg-zinc-800" onClick={() => setHide(true)}>
@@ -33,21 +33,21 @@ export default function FocusInfo ({ data, earthRadius }) {
           </svg>
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-start">
+      <div className="grid grid-cols-3 gap-1 py-1 items-start">
         <div className="uppercase">Name</div>
-        <div>{data.name}</div>
+        <div className="col-span-2">{data.name}</div>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-start">
+      <div className="grid grid-cols-3 gap-1 py-1 items-start">
         <div>lat</div>
-        <div>{data.lat.toFixed(3)}</div>
+        <div className="col-span-2">{data.lat.toFixed(3)}</div>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-start">
+      <div className="grid grid-cols-3 gap-1 py-1 items-start">
         <div>lng</div>
-        <div>{data.lng.toFixed(3)}</div>
+        <div className="col-span-2">{data.lng.toFixed(3)}</div>
       </div>
-      <div className="grid grid-cols-2 gap-1 py-1 items-start">
+      <div className="grid grid-cols-3 gap-1 py-1 items-start">
         <div>alt</div>
-        <div>{(data.alt * earthRadius).toFixed(3)}</div>
+        <div className="col-span-2">{(data.alt * earthRadius).toFixed(3)}</div>
       </div>
     </div>
   )
