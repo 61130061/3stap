@@ -11,7 +11,7 @@ import globeTextureUrl from './assets/earth-water.png';
 
 class Globe {
   constructor(globeRef, frameTicker) {
-    const scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'start' };
+    this.scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'start' };
 
     this.EARTH_RADIUS_KM = 6371; // km
     this.SAT_SIZE = 300; // km
@@ -145,7 +145,7 @@ class Globe {
 
       if (intersects.length > 0) {
         this.setFocus(intersects[0].object.name);
-        document.getElementById('sat-list-' + d.name).scrollIntoView(scrollOption);
+        document.getElementById('sat-list-' + intersects[0].object.name).scrollIntoView(this.scrollOption);
       }
 
     }, false);
@@ -309,7 +309,7 @@ class Globe {
       textDiv.innerText = d.name;
       labelDiv.onclick = () => {
         this.setFocus(d.name);
-        document.getElementById('sat-list-' + d.name).scrollIntoView(scrollOption);
+        document.getElementById('sat-list-' + d.name).scrollIntoView(this.scrollOption);
       }
       labelDiv.appendChild(textDiv);
 
