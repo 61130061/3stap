@@ -31,6 +31,10 @@ class Globe {
     this.labelObjs = [];
     this.focusSat = 'STARLETTE';
 
+    // mouse intersections
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
     this.globe = new ThreeGlobe()
       .polygonsData(
         countries.features.filter((d) => d.properties.ISO_A2 !== "AQ")
@@ -120,6 +124,27 @@ class Globe {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
     }, false);
+
+    // Detect Click on Satellite
+    document.addEventListener('mousedown', (event) => {
+      // For the following method to work correctly, set the canvas position *static*; margin > 0 and padding > 0 are OK
+      this.mouse.x = ((event.clientX - this.renderer.domElement.offsetLeft) / this.renderer.domElement.clientWidth) * 2 - 1;
+      this.mouse.y = - ((event.clientY - this.renderer.domElement.offsetTop) / this.renderer.domElement.clientHeight) * 2 + 1;
+
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const meshArr = [];
+      this.satData.map((d) => {
+        meshArr.push(d.obj);
+      })
+
+      const intersects = this.raycaster.intersectObjects(meshArr);
+
+      if (intersects.length > 0) {
+        this.setFocus(intersects[0].object.name);
+        location.href = '#sat-list-' + intersects[0].object.name;
+      }
+
+    }, false);
   }
 
   animate() {
@@ -154,7 +179,8 @@ class Globe {
 
         // Auto update path when orbit completed
         if (d.pathUpdate) {
-          if (this.time.getTime() > d.pathUpdate.getTime()) {
+          const pathStart = new Date(+d.pathUpdate - (this.PATH_TIME_RANGE * 1000))
+          if (this.time.getTime() > d.pathUpdate.getTime() || this.time.getTime() < pathStart.getTime()) {
             this.genPath(d);
             isUpdatePath = true
           }
