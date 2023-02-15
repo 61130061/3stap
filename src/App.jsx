@@ -108,7 +108,7 @@ function App() {
                   <button onClick={() => globe.timeSel = d} className="px-3 py-2 bg-zinc-900 border border-transparent hover:bg-zinc-800 rounded text-xs font-semibold" key={i}>{d}</button>
               )}
             </div>
-            <div className="px-2 py-1 bg-zinc-900 rounded">
+            <div className="text-xs sm:text-normal px-2 py-1 bg-zinc-900 rounded">
               {time.toString()}
             </div>
           </div>
