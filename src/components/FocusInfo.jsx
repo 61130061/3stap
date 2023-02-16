@@ -24,7 +24,7 @@ export default function FocusInfo ({ data, earthRadius }) {
   }
 
   return (
-    <div className="absolute z-20 max-w-[240px] bottom-[15vh] right-3 bg-zinc-900 rounded-lg p-3 text-sm">
+    <div className="absolute z-20 max-w-[260px] bottom-[15vh] right-3 bg-zinc-900 rounded-lg p-3 text-sm">
       <button className="absolute top-3 right-3 w-6 h-6 rounded text-gray-400 hover:bg-zinc-800" onClick={() => setHide(true)}>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 m-auto">
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
@@ -33,20 +33,24 @@ export default function FocusInfo ({ data, earthRadius }) {
       <div className="flex justify-between items-center mb-2">
         <div className="uppercase font-semibold mr-10">Selected Satellite</div>
       </div>
-      <div className="grid grid-cols-3 gap-1 py-1 items-start">
-        <div className="uppercase">Name</div>
+      <div className="grid grid-cols-3 gap-2 py-1 items-start">
+        <div className="uppercase">Name:</div>
         <div className="col-span-2">{data.name}</div>
       </div>
-      <div className="grid grid-cols-3 gap-1 py-1 items-start">
-        <div>lat</div>
+      <div className="grid grid-cols-3 gap-2 py-1 items-start">
+        <div className="uppercase">Norad ID:</div>
+        <div className="col-span-2">{data.norad_id}</div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 py-1 items-start">
+        <div>lat:</div>
         <div className="col-span-2">{data.lat.toFixed(3)}</div>
       </div>
-      <div className="grid grid-cols-3 gap-1 py-1 items-start">
-        <div>lng</div>
+      <div className="grid grid-cols-3 gap-2 py-1 items-start">
+        <div>lng:</div>
         <div className="col-span-2">{data.lng.toFixed(3)}</div>
       </div>
-      <div className="grid grid-cols-3 gap-1 py-1 items-start">
-        <div>alt</div>
+      <div className="grid grid-cols-3 gap-2 py-1 items-start">
+        <div>alt:</div>
         <div className="col-span-2">{(data.alt * earthRadius).toFixed(3)}</div>
       </div>
     </div>

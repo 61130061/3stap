@@ -11,8 +11,8 @@ export default function SatelliteList({ satData, globe, focus, norad }) {
     else if (window.innerWidth >= 640 && hidden) setHidden(false);
   }, [])
 
-  function onPushSats(tle) {
-    globe.pushSats([tle]);
+  function onPushSats(data) {
+    globe.pushSats([data]);
     setModal(false);
   }
 
@@ -22,7 +22,7 @@ export default function SatelliteList({ satData, globe, focus, norad }) {
         <AddSatelliteModal globe={globe} norad={norad} onClose={() => setModal(false)} onPushSats={onPushSats} />
       }
       {!hidden ?
-        <div className="absolute w-full sm:max-w-[360px] top-[10vh] sm:top-3 sm:right-3 bg-zinc-900 z-[90] rounded-lg py-3 text-sm flex flex-col gap-2">
+        <div className="absolute w-full sm:max-w-[360px] top-[15vh] sm:top-3 sm:right-3 bg-zinc-900 z-[90] rounded-lg py-3 text-sm flex flex-col gap-2">
           <button onClick={() => setHidden(true)} className="w-7 h-7 absolute top-2 right-4 text-gray-400">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 m-auto">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -37,7 +37,7 @@ export default function SatelliteList({ satData, globe, focus, norad }) {
             </div>
           }
           {satData.length > 0 &&
-            <div className="max-h-[35vh] overflow-y-auto scroll-smooth">
+            <div className="max-h-[30vh] sm:max-h-[35vh] overflow-y-auto scroll-smooth">
               {satData.map((d, i) =>
                 <div key={i} id={'sat-list-' + d.name} className="grid grid-cols-6 gap-2 hover:bg-zinc-800 px-4 py-1 items-center">
                   <div onClick={() => globe.setFocus(d.name)} className={`hover:cursor-pointer col-span-3${d.name == focus ? ' text-yellow-300' : ''}`}>{d.name}</div>

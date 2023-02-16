@@ -21,22 +21,10 @@ function App() {
   const globeRef = useRef(null);
 
   useEffect(() => {
-    setGlobe(new Globe(globeRef, frameTicker));
-
-    if (!norad) fetchNoradData(setNorad);
-
-    return () => {
-      setGlobe(null);
+    if (!norad) {
+      fetchNoradData(setNorad);
     }
   }, [])
-
-  useEffect(() => {
-    if (norad) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    }
-  }, [norad])
 
   function frameTicker(sd, t, p, ts, fs) {
     setSatData([...sd]);
@@ -70,9 +58,11 @@ function App() {
           })
         }
       });
-    })
-
-    set(arr);
+    }).then(() => {
+      set(arr);
+      setLoading(false);
+      setGlobe(new Globe(globeRef, arr, frameTicker));
+    });
   }
 
   return (

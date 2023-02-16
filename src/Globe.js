@@ -10,7 +10,7 @@ import globeTextureUrl from './assets/earth-water.png';
 
 
 class Globe {
-  constructor(globeRef, frameTicker) {
+  constructor(globeRef, norad, frameTicker) {
     this.scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'start' };
 
     this.EARTH_RADIUS_KM = 6371; // km
@@ -31,8 +31,9 @@ class Globe {
     this.frameTicker = frameTicker;
     this.time = new Date();
     this.satData = [];
+    this.norad = norad;
     this.labelObjs = [];
-    this.focusSat = 'STARLETTE';
+    this.focusSat = 'OSCAR 7 (AO-7)';
 
     this.globe = new ThreeGlobe()
       .polygonsData(
@@ -203,24 +204,24 @@ class Globe {
   }
 
   load(url) {
-    fetch(url).then(r => r.text()).then(rawData => {
-      const tleData = rawData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'));
-      this.satData = tleData.map(([name, ...tle]) => ({
-        satrec: satellite.twoline2satrec(...tle),
-        name: name.trim().replace(/^0 /, ''),
+    this.norad.slice(10, 20).map((d, i) => {
+      this.satData.push({
+        satrec: satellite.twoline2satrec(d.tle[1], d.tle[2]),
+        name: d.OBJECT_NAME,
+        norad_id: d.NORAD_CAT_ID,
         path: null,
-        showLabel: name.trim().replace(/^0 /, '') == 'STARLETTE' | name.trim().replace(/^0 /, '') == 'UOSAT 2 (UO-11)'
-      }));
-    }).then(() => {
-      this.satData.map((d, i) => {
-        if (i < 2) { // TODO: Fix this later
-          this.genPath(d);
-        }
-      });
-
-      this.updatePath();
-      this.updateLabel();
+        showLabel: i < 2 
+      })
     });
+
+    this.satData.map((d, i) => {
+      if (i < 2) { // TODO: Fix this later
+        this.genPath(d);
+      }
+    });
+
+    this.updatePath();
+    this.updateLabel();
   }
 
   set pause(value) {
@@ -388,16 +389,18 @@ class Globe {
   delSat(name) {
     this.satData = this.satData.filter(item => item.name != name);
     if (this.focusSat == name) this.setFocus(null); 
+    this.updatePath();
     this.updateLabel();
   }
 
   pushSats(arr) {
-    arr.map(([name, ...tle]) => {
+    arr.map((d, i) => {
       this.satData.unshift({
-        satrec: satellite.twoline2satrec(...tle),
-        name: name.trim().replace(/^0 /, ''),
+        satrec: satellite.twoline2satrec(d.tle[1], d.tle[2]),
+        name: d.OBJECT_NAME,
+        norad_id: d.NORAD_CAT_ID,
         path: null,
-        showLabel: true 
+        showLabel: true
       });
     });
 

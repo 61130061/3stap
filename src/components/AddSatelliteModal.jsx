@@ -43,7 +43,7 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
                       <div className="">{d.OBJECT_NAME}</div>
                       <div className="text-center">{d.NORAD_CAT_ID}</div>
                       <div className="flex justify-end">
-                        <button onClick={() => onPushSats(d.tle)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
+                        <button onClick={() => onPushSats(d)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                           </svg>
