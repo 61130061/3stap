@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as satellite from 'satellite.js';
 
 import SatelliteList from './components/SatelliteList';
 import FocusInfo from './components/FocusInfo';
@@ -83,7 +82,10 @@ function App() {
           <p>Loading...</p>
         </div> :
         <>
-          <div className="z-[90] text-5xl font-bold select-none absolute top-3 left-3">3STAP</div>
+          <div className="z-[90] select-none absolute top-5 left-5">
+            <div className="text-6xl font-bold mb-2">3STAP</div>
+            <div className="text-sm">by <a className="font-bold text-yellow-400" href="https://ascom-lab.space" target="_blank">ASCOM-LAB.SPACE</a></div>
+          </div>
           <SatelliteList norad={norad} satData={satData} globe={globe} focus={focus} />
           <FocusInfo data={focus ? satData.filter(item => item.name == focus)[0] : null} earthRadius={globe?.getEarthRadius()} />
           <div className="absolute bottom-3 z-[90] left-3 text-sm">
