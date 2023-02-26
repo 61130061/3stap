@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 export default function AddSatelliteModal({ onClose, norad, globe, onPushSats }) {
+  const [isByName, setIsByName] = useState(true);
   const [search, setSearch] = useState('');
   const [range, setRange] = useState([0, 30])
   const [data, setData] = useState(norad.filter(item => !globe.checkSatAdd(item.OBJECT_NAME)).slice(range[0], range[1]));
@@ -28,31 +29,59 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
             </button>
             <div>
               <div className="px-5 py-1 mb-2 text-xl font-semibold">Active Satellite List</div>
-              <div className="px-3 mb-1 bg-zinc-900">
-                <input className="w-full text-sm px-3 py-2 bg-zinc-800 rounded-lg" type="text" placeholder="search by name" />
+              <div className="flex text-sm items-center gap-2 px-3 mb-1 bg-zinc-900">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-zinc-800 rounded-lg"
+                  type="text"
+                  placeholder="Search"
+                />
+
+                <div className="flex items-center">
+                  <input className="peer/name hidden" id="by Name" name="search by" type="radio" checked={isByName} onChange={() => setIsByName(true)} />
+                  <label
+                    className="peer-checked/name:border-gray-400 peer-checked/name:text-white border-transparent text-gray-400 border px-2 rounded py-1 font-medium hover:cursor-pointer peer-checked/name:hover:cursor-default"
+                    htmlFor="by Name"
+                  >
+                    by Name
+                  </label>
+
+                  <input className="peer/norad hidden" id="by Norad ID" name="search by" type="radio" checked={!isByName} onChange={() => setIsByName(false)} />
+                  <label
+                    className="peer-checked/norad:border-gray-400 peer-checked/norad:text-white border-transparent text-gray-400 border px-2 rounded py-1 font-medium hover:cursor-pointer peer-checked/norad:hover:cursor-default"
+                    htmlFor="by Norad ID"
+                  >
+                    by Norad ID
+                  </label>
+                </div>
               </div>
               <div className="bg-zinc-900 grid grid-cols-3 gap-2 pr-6 px-5 py-3 items-center uppercase text-xs font-semibold">
                 <div>Name</div>
                 <div className="text-center">Norad CAT ID</div>
               </div>
-              {data ?
-                <div onScroll={e => handleScroll(e)} className="relative bg-zinc-900 overflow-y-auto max-h-[50vh]">
-                  {data.map((d, i) =>
-                    !globe.checkSatAdd(d.OBJECT_NAME) &&
-                    <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
-                      <div className="">{d.OBJECT_NAME}</div>
-                      <div className="text-center">{d.NORAD_CAT_ID}</div>
-                      <div className="flex justify-end">
-                        <button onClick={() => onPushSats(d)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div> :
-                <div className="px-5 text-xs text-center">Loading...</div>
+              {search == '' ?
+                <>
+                  {data ?
+                    <div onScroll={e => handleScroll(e)} className="relative bg-zinc-900 overflow-y-auto max-h-[50vh]">
+                      {data.map((d, i) =>
+                        !globe.checkSatAdd(d.OBJECT_NAME) &&
+                        <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
+                          <div className="">{d.OBJECT_NAME}</div>
+                          <div className="text-center">{d.NORAD_CAT_ID}</div>
+                          <div className="flex justify-end">
+                            <button onClick={() => onPushSats(d)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div> :
+                    <div className="px-5 text-xs text-center">Loading...</div>
+                  }</>
+                : <div>searching...</div>
               }
             </div>
           </div>
