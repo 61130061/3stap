@@ -24,8 +24,7 @@ class Globe {
     this.TIME_SELECT = 'x2';
     this.TIME_PAUSE = false;
 
-    this.PATH_TIME_RANGE = 6000;
-    this.PATH_TIME_STEP = 10;
+    this.PATH_TIME_STEP = 30;
 
     this.globeRef = globeRef;
     this.frameTicker = frameTicker;
@@ -179,22 +178,17 @@ class Globe {
           const gdPos = satellite.eciToGeodetic(eci.position, gmst);
           d.lat = satellite.radiansToDegrees(gdPos.latitude);
           d.lng = satellite.radiansToDegrees(gdPos.longitude);
-          d.alt = gdPos.height / this.EARTH_RADIUS_KM
+          d.alt = gdPos.height / this.EARTH_RADIUS_KM;
+          d.vel = Math.sqrt(Math.pow(eci.velocity.x, 2) + Math.pow(eci.velocity.y, 2) + Math.pow(eci.velocity.z, 2));
         }
 
-        // Auto update path when orbit completed
-        if (d.pathUpdate) {
-          const pathStart = new Date(+d.pathUpdate - (this.PATH_TIME_RANGE * 1000))
-          if (this.time.getTime() > d.pathUpdate.getTime() || this.time.getTime() < pathStart.getTime()) {
-            this.genPath(d);
-            isUpdatePath = true
-          }
-        }
+        if (d.path) this.genPath(d);
       });
 
       this.globe.objectsData(this.satData);
 
-      if (isUpdatePath) this.updatePath();
+      // if (isUpdatePath) this.updatePath();
+      this.updatePath()
 
       // Update label position
       this.labelObjs.map((d, i) => {
@@ -205,10 +199,12 @@ class Globe {
 
   load(url) {
     this.norad.slice(10, 20).map((d, i) => {
+      const satrec = satellite.twoline2satrec(d.tle[1], d.tle[2]);
       this.satData.push({
-        satrec: satellite.twoline2satrec(d.tle[1], d.tle[2]),
+        satrec,
         name: d.OBJECT_NAME,
         norad_id: d.NORAD_CAT_ID,
+        orbitalPeriod: (2 * Math.PI)/(satrec.no/60),
         path: null,
         showLabel: i < 2 
       })
@@ -331,10 +327,10 @@ class Globe {
       const pathArr = [];
 
       const t = new Date(+this.time);
+      let gmst = satellite.gstime(t);
 
-      for (let i = 0; i < this.PATH_TIME_RANGE; i += this.PATH_TIME_STEP) {
+      for (let i = 0; i < data.orbitalPeriod + 100; i += this.PATH_TIME_STEP) {
         const newt = new Date(+t + (i * 1000));
-        const gmst = satellite.gstime(newt);
         const eci = satellite.propagate(data.satrec, newt);
         if (eci.position) {
           const gdPos = satellite.eciToGeodetic(eci.position, gmst);
@@ -346,7 +342,6 @@ class Globe {
       }
 
       this.satData[index].path = pathArr;
-      this.satData[index].pathUpdate = new Date(+t + (this.PATH_TIME_RANGE * 1000))
     }
   }
 
