@@ -33,25 +33,33 @@ export default function FocusInfo ({ data, earthRadius }) {
       <div className="flex justify-between items-center mb-2">
         <div className="uppercase font-semibold mr-10">Selected Satellite</div>
       </div>
-      <div className="grid grid-cols-3 gap-2 py-1 items-start">
-        <div className="uppercase">Name:</div>
-        <div className="col-span-2">{data.name}</div>
+      <div className="grid grid-cols-6 gap-2 py-1 items-start">
+        <div className="uppercase col-span-2">Name:</div>
+        <div className="col-span-3">{data.name}</div>
       </div>
-      <div className="grid grid-cols-3 gap-2 py-1 items-start">
-        <div className="uppercase">Norad ID:</div>
-        <div className="col-span-2">{data.norad_id}</div>
+      <div className="grid grid-cols-6 gap-2 py-1 items-start">
+        <div className="uppercase col-span-2">Norad ID:</div>
+        <div className="col-span-3">{data.norad_id}</div>
       </div>
-      <div className="grid grid-cols-3 gap-2 py-1 items-start">
-        <div>lat:</div>
-        <div className="col-span-2">{data.lat.toFixed(3)}</div>
+      <div className="grid grid-cols-6 gap-2 py-1 items-start">
+        <div className="col-span-2">lat:</div>
+        <div className="col-span-3">{data.lat.toFixed(3)}</div>
+        <div>deg</div>
       </div>
-      <div className="grid grid-cols-3 gap-2 py-1 items-start">
-        <div>lng:</div>
-        <div className="col-span-2">{data.lng.toFixed(3)}</div>
+      <div className="grid grid-cols-6 gap-2 py-1 items-start">
+        <div className="col-span-2">lng:</div>
+        <div className="col-span-3">{data.lng.toFixed(3)}</div>
+        <div>deg</div>
       </div>
-      <div className="grid grid-cols-3 gap-2 py-1 items-start">
-        <div>alt:</div>
-        <div className="col-span-2">{(data.alt * earthRadius).toFixed(3)}</div>
+      <div className="grid grid-cols-6 gap-2 py-1 items-start">
+        <div className="col-span-2">alt:</div>
+        <div className="col-span-3">{(data.alt * earthRadius).toFixed(3)}</div>
+        <div>deg</div>
+      </div>
+      <div className="grid grid-cols-6 gap-2 py-1 items-start">
+        <div className="col-span-2">velocity:</div>
+        <div className="col-span-3">{data.vel.toFixed(3)}</div>
+        <div>km/s</div> 
       </div>
     </div>
   )
