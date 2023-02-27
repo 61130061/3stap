@@ -390,10 +390,12 @@ class Globe {
 
   pushSats(arr) {
     arr.map((d, i) => {
+      const satrec = satellite.twoline2satrec(d.tle[1], d.tle[2]);
       this.satData.unshift({
-        satrec: satellite.twoline2satrec(d.tle[1], d.tle[2]),
+        satrec,
         name: d.OBJECT_NAME,
         norad_id: d.NORAD_CAT_ID,
+        orbitalPeriod: (2 * Math.PI)/(satrec.no/60),
         path: null,
         showLabel: true
       });
