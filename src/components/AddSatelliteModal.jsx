@@ -63,7 +63,7 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
               {search == '' ?
                 <>
                   {data ?
-                    <div onScroll={e => handleScroll(e)} className="relative bg-zinc-900 overflow-y-auto max-h-[50vh]">
+                    <div onScroll={e => handleScroll(e)} className="relative bg-zinc-900 overflow-y-auto h-[50vh]">
                       {data.map((d, i) =>
                         !globe.checkSatAdd(d.OBJECT_NAME) &&
                         <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
@@ -79,9 +79,29 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
                         </div>
                       )}
                     </div> :
-                    <div className="px-5 text-xs text-center">Loading...</div>
-                  }</>
-                : <div>searching...</div>
+                    <div className="h-[50vh] px-5 text-xs text-center">Loading...</div>
+                  }</> :
+                <div className="relative bg-zinc-900 overflow-y-auto h-[50vh]">
+                  {norad.filter(item => {
+                    if (!isByName) {
+                      return item.NORAD_CAT_ID.toString().toLowerCase().includes(search.toLowerCase())
+                    }
+                    return item.OBJECT_NAME.toLowerCase().includes(search.toLowerCase())
+                  }).map((d, i) =>
+                    !globe.checkSatAdd(d.OBJECT_NAME) &&
+                    <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
+                      <div className="">{d.OBJECT_NAME}</div>
+                      <div className="text-center">{d.NORAD_CAT_ID}</div>
+                      <div className="flex justify-end">
+                        <button onClick={() => onPushSats(d)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               }
             </div>
           </div>

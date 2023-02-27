@@ -35,11 +35,11 @@ export default function FocusInfo ({ data, earthRadius }) {
       </div>
       <div className="grid grid-cols-6 gap-2 py-1 items-start">
         <div className="uppercase col-span-2">Name:</div>
-        <div className="col-span-3">{data.name}</div>
+        <div className="col-span-4">{data.name}</div>
       </div>
       <div className="grid grid-cols-6 gap-2 py-1 items-start">
         <div className="uppercase col-span-2">Norad ID:</div>
-        <div className="col-span-3">{data.norad_id}</div>
+        <div className="col-span-4">{data.norad_id}</div>
       </div>
       <div className="grid grid-cols-6 gap-2 py-1 items-start">
         <div className="col-span-2">lat:</div>
