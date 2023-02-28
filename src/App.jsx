@@ -35,17 +35,66 @@ function App() {
   }
 
   function fetchNoradData(set) {
-    // Currently fetch only active satellite data (static file)
-    // Satellite Data Source - https://celestrak.org/NORAD/elements/index.php?FORMAT=tle
-    /*
-     TODO: 
-     - [ ] fetch directly from source (problem: too slow)
-     - [ ] fetch more other categories data
-    */
+    const url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle';
 
+    fetch('https://celestrak.org/NORAD/elements/index.php?FORMAT=tle').then((res) => res.text()).then((html) => {
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, "text/html");
+
+      const updateEle = doc.activeElement.firstElementChild.getElementsByTagName('h3');
+      const localUpdate = localStorage.getItem('celestrak-update');
+
+      if (updateEle[0] && localUpdate && updateEle[0].innerText == localUpdate) {
+        // fetch data from localstorage
+        const ctData = localStorage.getItem('celestrak-data');
+        if (ctData) {
+          console.log('Loading data from localstorage!');
+          
+          let arr = [];
+
+          const tleData = ctData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'));
+          tleData.map((d, i) => {
+            const satrec = satellite.twoline2satrec(d[1], d[2]);
+
+            arr.push({
+              satrec,
+              name: d[0].trim().replace(/^0 /, ''), // trim name
+              norad_id: satrec.satnum.replace(/\b0+/g, ''),
+              orbitalPeriod: (2 * Math.PI) / (satrec.no / 60),
+              path: null,
+              showLabel: false
+            });
+          });
+
+          set(arr);
+          setLoading(false);
+          setGlobe(prev => { 
+            return new Globe(globeRef, arr, frameTicker)
+          });
+        }
+        return
+      }
+
+      fetchData(set, url, (data) => {
+        localStorage.setItem('celestrak-update', updateEle[0].innerText);
+        localStorage.setItem('celestrak-data', data);
+      });
+    }).catch((err) => {
+      console.log('Failed to check update data from CelesTrak!');
+      console.log(err);
+
+      // fetch data from file
+      fetchData(set, tleActive);
+    });
+
+  }
+
+  function fetchData (set, source, callback) {
     let arr = [];
 
-    fetch(tleActive).then(res => res.text()).then(rawData => {
+    console.log(source);
+
+    fetch(source).then(res => res.text()).then(rawData => {
       const tleData = rawData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'));
       tleData.map((d, i) => {
         const satrec = satellite.twoline2satrec(d[1], d[2]);
@@ -59,11 +108,21 @@ function App() {
           showLabel: false
         });
       });
-    }).then(() => {
+
+      return rawData;
+    }).then((data) => {
       set(arr);
       setLoading(false);
-      setGlobe(new Globe(globeRef, arr, frameTicker));
-    });
+      setGlobe(prev => {
+        return new Globe(globeRef, arr, frameTicker)
+      });
+      if (callback) callback(data);
+    }).catch((err) => {
+      console.log('Failed to fetch data from source!');
+      console.log(err);
+
+      fetchData(set, tleActive);
+    })
   }
 
   return (
