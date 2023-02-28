@@ -44,7 +44,7 @@ function App() {
       const updateEle = doc.activeElement.firstElementChild.getElementsByTagName('h3');
       const localUpdate = localStorage.getItem('celestrak-update');
 
-      if (updateEle[0] && localUpdate && updateEle[0].innerText == localUpdate) {
+      if (updateEle.length > 0 && localUpdate && updateEle[0].innerText == localUpdate) {
         // fetch data from localstorage
         const ctData = localStorage.getItem('celestrak-data');
         if (ctData) {
