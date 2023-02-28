@@ -4,7 +4,7 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
   const [isByName, setIsByName] = useState(true);
   const [search, setSearch] = useState('');
   const [range, setRange] = useState([0, 30])
-  const [data, setData] = useState(norad.filter(item => !globe.checkSatAdd(item.OBJECT_NAME)).slice(range[0], range[1]));
+  const [data, setData] = useState(norad.filter(item => !globe.checkSatAdd(item.name)).slice(range[0], range[1]));
 
   const handleScroll = e => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 100;
@@ -65,10 +65,10 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
                   {data ?
                     <div onScroll={e => handleScroll(e)} className="relative bg-zinc-900 overflow-y-auto h-[50vh]">
                       {data.map((d, i) =>
-                        !globe.checkSatAdd(d.OBJECT_NAME) &&
+                        !globe.checkSatAdd(d.name) &&
                         <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
-                          <div className="">{d.OBJECT_NAME}</div>
-                          <div className="text-center">{d.NORAD_CAT_ID}</div>
+                          <div className="">{d.name}</div>
+                          <div className="text-center">{d.norad_id}</div>
                           <div className="flex justify-end">
                             <button onClick={() => onPushSats(d)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">
@@ -84,14 +84,14 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
                 <div className="relative bg-zinc-900 overflow-y-auto h-[50vh]">
                   {norad.filter(item => {
                     if (!isByName) {
-                      return item.NORAD_CAT_ID.toString().toLowerCase().includes(search.toLowerCase())
+                      return item.norad_id.toString().toLowerCase().includes(search.toLowerCase())
                     }
-                    return item.OBJECT_NAME.toLowerCase().includes(search.toLowerCase())
+                    return item.name.toLowerCase().includes(search.toLowerCase())
                   }).map((d, i) =>
-                    !globe.checkSatAdd(d.OBJECT_NAME) &&
+                    !globe.checkSatAdd(d.name) &&
                     <div key={i} className="grid grid-cols-3 gap-2 px-5 py-2 items-center text-xs font-semibold hover:bg-zinc-800 border-b border-opacity-50 border-zinc-500 last:border-0">
-                      <div className="">{d.OBJECT_NAME}</div>
-                      <div className="text-center">{d.NORAD_CAT_ID}</div>
+                      <div className="">{d.name}</div>
+                      <div className="text-center">{d.norad_id}</div>
                       <div className="flex justify-end">
                         <button onClick={() => onPushSats(d)} className="px-1 py-1 text-xs bg-zinc-800 rounded border border-zinc-900 group">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 group-hover:text-green-400">

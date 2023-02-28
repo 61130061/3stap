@@ -5,7 +5,6 @@ import * as satellite from 'satellite.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import countries from './assets/countries.json';
-import tleUrl from './assets/tle.txt';
 import globeTextureUrl from './assets/earth-water.png';
 
 
@@ -115,7 +114,7 @@ class Globe {
 
     this.animate();
 
-    this.load(tleUrl);
+    this.load();
 
     this.ticker();
 
@@ -197,17 +196,11 @@ class Globe {
     }
   }
 
-  load(url) {
-    this.norad.slice(10, 20).map((d, i) => {
-      const satrec = satellite.twoline2satrec(d.tle[1], d.tle[2]);
-      this.satData.push({
-        satrec,
-        name: d.OBJECT_NAME,
-        norad_id: d.NORAD_CAT_ID,
-        orbitalPeriod: (2 * Math.PI)/(satrec.no/60),
-        path: null,
-        showLabel: i < 2 
-      })
+  load() {
+    this.satData = this.norad.slice(10, 20);
+
+    this.satData.forEach((d, i) => {
+      d.showLabel = i < 2;
     });
 
     this.satData.map((d, i) => {
@@ -329,7 +322,7 @@ class Globe {
       const t = new Date(+this.time);
       let gmst = satellite.gstime(t);
 
-      for (let i = 0; i < data.orbitalPeriod + 100; i += this.PATH_TIME_STEP) {
+      for (let i = 0; i < data.orbitalPeriod + 30; i += this.PATH_TIME_STEP) {
         const newt = new Date(+t + (i * 1000));
         const eci = satellite.propagate(data.satrec, newt);
         if (eci.position) {
@@ -389,16 +382,10 @@ class Globe {
   }
 
   pushSats(arr) {
-    arr.map((d, i) => {
-      const satrec = satellite.twoline2satrec(d.tle[1], d.tle[2]);
-      this.satData.unshift({
-        satrec,
-        name: d.OBJECT_NAME,
-        norad_id: d.NORAD_CAT_ID,
-        orbitalPeriod: (2 * Math.PI)/(satrec.no/60),
-        path: null,
-        showLabel: true
-      });
+    arr.forEach((d, i) => {
+      d.showLabel = true;
+
+      this.satData.unshift(d);
     });
 
     this.updateLabel();

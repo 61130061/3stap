@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as satellite from 'satellite.js';
 
 import SatelliteList from './components/SatelliteList';
 import FocusInfo from './components/FocusInfo';
 
 import Globe from './Globe.js';
-import noradJson from './assets/norad_active.json';
 import tleActive from './assets/tle_active.txt';
 
 function App() {
@@ -47,16 +47,17 @@ function App() {
 
     fetch(tleActive).then(res => res.text()).then(rawData => {
       const tleData = rawData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'));
-      tleData.forEach((d) => {
-        d[0] = d[0].trim().replace(/^0 /, ''); // trim name
+      tleData.map((d, i) => {
+        const satrec = satellite.twoline2satrec(d[1], d[2]);
 
-        const nd = noradJson.filter(item => item.OBJECT_NAME == d[0]);
-
-        if (nd[0]) {
-          arr.push({ ...nd[0],
-            tle: d
-          })
-        }
+        arr.push({
+          satrec,
+          name: d[0].trim().replace(/^0 /, ''), // trim name
+          norad_id: satrec.satnum.replace(/\b0+/g, ''),
+          orbitalPeriod: (2 * Math.PI) / (satrec.no / 60),
+          path: null,
+          showLabel: false
+        });
       });
     }).then(() => {
       set(arr);
