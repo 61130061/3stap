@@ -7,6 +7,7 @@ import FocusInfo from './components/FocusInfo';
 import Globe from './Globe.js';
 import tleActive from './assets/tle_active.txt';
 
+
 function App() {
   const [loading, setLoading] = useState(true);
   const [norad, setNorad] = useState(null);
@@ -18,11 +19,23 @@ function App() {
   const [timeSel, setTimeSel] = useState('x2');
   const [focus, setFocus] = useState(null);
 
+  const [source, setSource] = useState('3STAP TLE');
+  const [isRefresh, setIsRefresh] = useState(false);
+
   const globeRef = useRef(null);
+  const url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle';
+  var params = new URLSearchParams(window.location.search);
 
   useEffect(() => {
     if (!norad) {
-      fetchNoradData(setNorad);
+      if (params.get('data') == 'dev') {
+        console.log('dev mode');
+        fetchData(setNorad, false, () => {
+          setSource('previous data collected by 3STAP (click REFRESH DATA to download latest data)');
+        });
+      } else {
+        fetchNoradData(setNorad, true);
+      }
     }
   }, [])
 
@@ -34,10 +47,14 @@ function App() {
     setFocus(fs);
   }
 
-  function fetchNoradData(set) {
-    const url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle';
+  function fetchNoradData(set, abort) {
+    // Fetching aborting
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    fetch('https://celestrak.org/NORAD/elements/index.php?FORMAT=tle').then((res) => res.text()).then((html) => {
+    setIsRefresh(true);
+
+    fetch('https://celestrak.org/NORAD/elements/index.php?FORMAT=tle', { signal: abort && controller.signal }).then((res) => res.text()).then((html) => {
       var parser = new DOMParser();
       var doc = parser.parseFromString(html, "text/html");
 
@@ -63,38 +80,46 @@ function App() {
               orbitalPeriod: (2 * Math.PI) / (satrec.no / 60),
               path: null,
               showLabel: false
-            });
-          });
+            }); });
 
           set(arr);
           setLoading(false);
-          setGlobe(prev => { 
-            return new Globe(globeRef, arr, frameTicker)
-          });
+          setTimeout(() => setIsRefresh(false), 3000);
+          setGlobe(new Globe(globeRef, arr, frameTicker));
+          setSource('celestrak.org ' + updateEle[0].innerText);
         }
         return
       }
 
-      fetchData(set, url, (data) => {
+      fetchData(set, url, true, (data) => {
         localStorage.setItem('celestrak-update', updateEle[0].innerText);
         localStorage.setItem('celestrak-data', data);
+        setSource('celestrak.org ' + updateEle[0].innerText);
+        setTimeout(() => setIsRefresh(false), 3000);
       });
     }).catch((err) => {
       console.log('Failed to check update data from CelesTrak!');
       console.log(err);
 
       // fetch data from file
-      fetchData(set, tleActive);
+      fetchData(set, tleActive, false, () => {
+        setSource('previous data collected by 3STAP (click REFRESH DATA to download latest data)');
+        setTimeout(() => setIsRefresh(false), 3000);
+      });
     });
 
   }
 
-  function fetchData (set, source, callback) {
+  function fetchData (set, source, abort, callback) {
+    // Fetching aborting
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     let arr = [];
 
     console.log(source);
 
-    fetch(source).then(res => res.text()).then(rawData => {
+    fetch(source, { signal: abort && controller.signal }).then(res => res.text()).then(rawData => {
       const tleData = rawData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'));
       tleData.map((d, i) => {
         const satrec = satellite.twoline2satrec(d[1], d[2]);
@@ -113,28 +138,40 @@ function App() {
     }).then((data) => {
       set(arr);
       setLoading(false);
-      setGlobe(prev => {
-        return new Globe(globeRef, arr, frameTicker)
-      });
+      setGlobe(new Globe(globeRef, arr, frameTicker));
       if (callback) callback(data);
     }).catch((err) => {
       console.log('Failed to fetch data from source!');
       console.log(err);
 
-      fetchData(set, tleActive);
+      fetchData(set, tleActive, false, () => {
+        setSource('previous data collected by 3STAP (click REFRESH DATA to download latest data)');
+      });
     })
   }
 
   return (
     <main>
       {loading ?
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex z-[999] justify-center items-center h-screen">
           <p>Loading...</p>
         </div> :
         <>
-          <div className="z-[90] select-none absolute top-5 left-5">
+          <div className="z-[90] select-none absolute top-3 left-5">
             <div className="text-6xl font-bold mb-2">3STAP</div>
-            <div className="text-sm">by <a className="font-bold text-yellow-400" href="https://ascom-lab.space" target="_blank">ASCOM-LAB.SPACE</a></div>
+            <div className="text-sm mb-3">by <a className="font-bold text-yellow-400" href="https://ascom-lab.space" target="_blank">ASCOM-LAB.SPACE</a></div>
+            <div className="text-xs rounded max-w-[200px] mb-1 text-gray-500">
+              TLE source: {source} 
+            </div>
+            <button 
+              onClick={() => {
+                fetchNoradData(setNorad, false);
+              }}
+              className="text-sm text-gray-400 underline underline-offset-2 hover:text-white disabled:cursor-not-allowed disabled:no-underline disabled:hover:text-gray-400"
+              disabled={isRefresh}
+            >
+              {isRefresh ? 'Loading...' : 'REFRESH DATA'}
+            </button>
           </div>
           <SatelliteList norad={norad} satData={satData} globe={globe} focus={focus} />
           <FocusInfo data={focus ? satData.filter(item => item.name == focus)[0] : null} earthRadius={globe?.getEarthRadius()} />
