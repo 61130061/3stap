@@ -29,7 +29,7 @@ export default function AddSatelliteModal({ onClose, norad, globe, onPushSats })
             </button>
             <div>
               <div className="px-5 py-1 mb-2 text-xl font-semibold">Active Satellite List</div>
-              <div className="flex text-sm items-center gap-2 px-3 mb-1 bg-zinc-900">
+              <div className="flex flex-wrap text-sm items-center gap-2 px-3 mb-1 bg-zinc-900">
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
