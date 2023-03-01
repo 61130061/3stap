@@ -21,6 +21,7 @@ function App() {
 
   const [source, setSource] = useState('3STAP TLE');
   const [isRefresh, setIsRefresh] = useState(false);
+  const [lockMode, setLockMode] = useState(false);
 
   const globeRef = useRef(null);
   const url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle';
@@ -39,12 +40,13 @@ function App() {
     }
   }, [])
 
-  function frameTicker(sd, t, p, ts, fs) {
+  function frameTicker(sd, t, p, ts, fs, lm) {
     setSatData([...sd]);
     setTime(t);
     setPause(p);
     setTimeSel(ts);
     setFocus(fs);
+    setLockMode(lm);
   }
 
   function fetchNoradData(set, abort) {
@@ -160,18 +162,29 @@ function App() {
           <div className="z-[90] select-none absolute top-3 left-5">
             <div className="text-6xl font-bold mb-2">3STAP</div>
             <div className="text-sm mb-3">by <a className="font-bold text-yellow-400" href="https://ascom-lab.space" target="_blank">ASCOM-LAB.SPACE</a></div>
-            <div className="text-xs rounded max-w-[180px] mb-1 text-gray-500">
-              TLE source: {source} 
+            <div className="flex flex-col items-start gap-1 text-xs rounded max-w-[180px] mb-3 text-gray-500">
+              TLE source: {source}
+              <button
+                onClick={() => {
+                  fetchNoradData(setNorad, false);
+                }}
+                className="text-sm text-gray-400 underline underline-offset-2 hover:text-white disabled:cursor-not-allowed disabled:no-underline disabled:hover:text-gray-400"
+                disabled={isRefresh}
+              >
+                {isRefresh ? 'Loading...' : 'REFRESH DATA'}
+              </button>
             </div>
-            <button 
-              onClick={() => {
-                fetchNoradData(setNorad, false);
-              }}
-              className="text-sm text-gray-400 underline underline-offset-2 hover:text-white disabled:cursor-not-allowed disabled:no-underline disabled:hover:text-gray-400"
-              disabled={isRefresh}
-            >
-              {isRefresh ? 'Loading...' : 'REFRESH DATA'}
-            </button>
+            <div>
+              <button
+                onClick={() => globe.setLockMode(!lockMode)}
+                className={["flex gap-2 items-center group px-2 py-2 bg-zinc-900 hover:bg-zinc-800 rounded capitalize text-xs font-semibold border", lockMode ? "border-gray-400 text-white" : "text-gray-400 border-transparent"].join(' ')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                </svg>
+                <p className="group-hover:block hidden">{lockMode ? 'Earth View' : 'Satellite View'}</p>
+              </button>
+            </div>
           </div>
           <SatelliteList norad={norad} satData={satData} globe={globe} focus={focus} />
           <FocusInfo data={focus ? satData.filter(item => item.name == focus)[0] : null} earthRadius={globe?.getEarthRadius()} />

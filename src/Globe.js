@@ -7,7 +7,6 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import countries from './assets/countries.json';
 import globeTextureUrl from './assets/earth-water.png';
 
-
 class Globe {
   constructor(globeRef, norad, frameTicker) {
     this.scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'start' };
@@ -32,6 +31,7 @@ class Globe {
     this.norad = norad;
     this.labelObjs = [];
     this.focusSat = 'OSCAR 7 (AO-7)';
+    this.lockMode = false;
 
     this.globe = new ThreeGlobe()
       .polygonsData(
@@ -155,12 +155,14 @@ class Globe {
     this.renderer.render(this.scene, this.camera);
     this.labelRenderer.render(this.scene, this.camera);
     // Send variable to react
-    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT, this.focusSat);
+    this.frameTicker(this.satData, this.time, this.TIME_PAUSE, this.TIME_SELECT, this.focusSat, this.lockMode);
     requestAnimationFrame(this.animate.bind(this));
   }
 
   ticker() {
     requestAnimationFrame(this.ticker.bind(this));
+
+    this.updateControls();
 
     if (!this.TIME_PAUSE) {
       if (this.TIME_SELECT == 'live') {
@@ -389,6 +391,36 @@ class Globe {
     });
 
     this.updateLabel();
+  }
+
+  setLockMode(value) {
+    this.lockMode = value;
+  }
+
+  getLockMode() {
+    return this.lockMode;
+  }
+
+  getCoords(mesh) {
+    var geometry = mesh.geometry;
+    geometry.computeBoundingBox();
+    var center = new THREE.Vector3();
+    geometry.boundingBox.getCenter(center);
+    mesh.localToWorld(center);
+    return center;
+  }
+  
+  updateControls() { // TODO: zoomTo with animation with TWEEN.js
+    if (this.lockMode && this.focusSat) {
+      const selected = this.satData.filter(item => item.name == this.focusSat)[0].obj;
+
+      const objectPos = this.getCoords(selected);
+
+      this.controls.target.set(objectPos.x, objectPos.y, objectPos.z);
+      this.controls.update();
+    } else {
+      this.controls.target.set(0, 0, 0);
+    }
   }
 }
 
