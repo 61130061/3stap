@@ -160,7 +160,7 @@ function App() {
           <div className="z-[90] select-none absolute top-3 left-5">
             <div className="text-6xl font-bold mb-2">3STAP</div>
             <div className="text-sm mb-3">by <a className="font-bold text-yellow-400" href="https://ascom-lab.space" target="_blank">ASCOM-LAB.SPACE</a></div>
-            <div className="text-xs rounded max-w-[200px] mb-1 text-gray-500">
+            <div className="text-xs rounded max-w-[180px] mb-1 text-gray-500">
               TLE source: {source} 
             </div>
             <button 
@@ -177,7 +177,7 @@ function App() {
           <FocusInfo data={focus ? satData.filter(item => item.name == focus)[0] : null} earthRadius={globe?.getEarthRadius()} />
           <div className="absolute bottom-3 z-[90] left-3 text-sm">
             <div className="flex gap-2 mb-2">
-              <button onClick={() => globe.pause = !pause} className="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded capitalize text-xs font-semibold">
+              <button onClick={() => globe.pause = !pause} className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 rounded capitalize text-xs font-semibold">
                 {pause ?
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                     <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
